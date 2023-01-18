@@ -10,10 +10,16 @@ function userSearch(event) {
     fetch(`https://api.github.com/search/users?q=${username}`)
     .then(res => res.json())
     .then(json => renderUsers(json.items))
+    const form = document.getElementById("github-form");
+    form.reset();
 };
 
-function repoSearch() {
-
+function repoSearch(event) {
+    event.preventDefault();
+    let username = (event.target.id);
+    fetch(`https://api.github.com/users/${username}/repos`)
+    .then(res => res.json())
+    .then(json => renderRepos(json))
 };
 
 // Render users
@@ -23,10 +29,23 @@ function renderUsers(users) {
     users.forEach(user => {
         const card = document.createElement("div");
         card.className = "card";
-        card.innerHTML = `<h2>${user.login}</h2>
-        <img src="${user.avatar_url}" class="user-avatar">
-        <a href="${user.url}" class="user-profile-link"> Profile </a>`
+        card.innerHTML = `<a href onclick="repoSearch(event)"><h2 id=${user.login}>${user.login}</h2></a>
+        <img src="${user.avatar_url}" class="user-avatar" height="250px" width="250 px">
+        <br>
+        <a href="${user.html_url}" class="user-profile-link"> Profile </a>`
         userList.appendChild(card);
+    });
+};
+
+// Render repos
+
+function renderRepos(repos) {
+    const repoList = document.getElementById("repos-list");
+    repos.forEach(repo => {
+        const repoCard = document.createElement("div");
+        repoCard.className = "repoCard";
+        repoCard.innerHTML = `<p>${repo.name}</p>`
+        repoList.appendChild(repoCard);
     });
 };
 
